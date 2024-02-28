@@ -3,21 +3,18 @@ extern crate graphics;
 extern crate opengl_graphics;
 extern crate piston;
 
-use glutin_window::GlutinWindow as Window;
-use opengl_graphics::{GlGraphics, OpenGL};
-use piston::event_loop::{EventSettings, Events};
-use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent};
-use piston::window::WindowSettings;
+use opengl_graphics::GlGraphics;
+use piston::input::{RenderArgs, UpdateArgs};
 
-use super::*;
+use super::Object;
 
 pub struct World {
-    gl: GlGraphics, // OpenGL drawing backend
-    objects: Vec<Object::Object>,
+    pub gl: GlGraphics, // OpenGL drawing backend
+    pub objects: Vec<Object>,
 }
 
 impl World {
-    fn render(&mut self, args: &RenderArgs) {
+    pub fn render(&mut self, args: &RenderArgs) {
         use graphics::*;
 
         let square = rectangle::square(0.0, 0.0, 50.0);
@@ -35,7 +32,7 @@ impl World {
         }
     }
 
-    fn update(&mut self, args: &UpdateArgs) {
+    pub fn update(&mut self, _args: &UpdateArgs) {
         // // Rotate 2 radians per second.
         // self.rotation += 2.0 * args.dt;
 

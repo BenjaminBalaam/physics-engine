@@ -1,3 +1,7 @@
-pub mod World;
-pub mod Object;
-pub mod Vector;
+pub mod vector;
+pub mod world;
+pub mod object;
+
+pub use vector::Vector;
+pub use world::World;
+pub use object::Object;

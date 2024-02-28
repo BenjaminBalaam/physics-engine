@@ -6,10 +6,13 @@ extern crate piston;
 use glutin_window::GlutinWindow as Window;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
-use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent};
+use piston::input::{RenderEvent, UpdateEvent};
 use piston::window::WindowSettings;
 
 pub mod models;
+use models::Vector;
+use models::World;
+use models::Object;
 
 fn main() {
     // Change this to OpenGL::V2_1 if not working.
@@ -22,11 +25,11 @@ fn main() {
         .build()
         .unwrap();
 
-    let mut objects = vec![
-        Object::Object([1.0, 1.0, 1.0, 1.0], Vector::Vector(0.0, 0.0), 0.0)
+    let objects = vec![
+        Object {colour: [1.0, 1.0, 1.0, 1.0], position: Vector {x: 0.0, y: 0.0}, rotation: 0.0}
     ];
 
-    let mut world = World::World {
+    let mut world = World {
         gl: GlGraphics::new(opengl),
         objects,
     };
