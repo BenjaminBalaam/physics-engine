@@ -3,6 +3,8 @@ extern crate graphics;
 extern crate opengl_graphics;
 extern crate piston;
 
+use std::f64::consts::PI;
+
 use glutin_window::GlutinWindow as Window;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
@@ -19,20 +21,28 @@ fn main() {
     let opengl = OpenGL::V3_2;
 
     // Create a Glutin window.
-    let mut window: Window = WindowSettings::new("physics-engine", [200, 200])
+    let mut window: Window = WindowSettings::new("physics-engine", [960, 540])
         .graphics_api(opengl)
         .exit_on_esc(true)
         .build()
         .unwrap();
 
     let objects = vec![
-        Object {colour: [1.0, 1.0, 1.0, 1.0], position: Vector {x: 0.0, y: 0.0}, rotation: 0.0}
+        Object::new(
+            [1.0, 0.0, 0.0, 1.0],
+            Vector {x: 480.0, y: 0.0},
+            0.0,
+            Vector {x: 0.0, y: 0.0}
+        ),
+        Object::new_passive(
+            [1.0, 1.0, 1.0, 1.0],
+            Vector {x: 700.0, y: 300.0},
+            PI / 4.0,
+            Vector {x: 0.0, y: 0.0},
+        ),
     ];
 
-    let mut world = World {
-        gl: GlGraphics::new(opengl),
-        objects,
-    };
+    let mut world = World::new(GlGraphics::new(opengl), objects);
 
     let mut events = Events::new(EventSettings::new());
     while let Some(e) = events.next(&mut window) {
