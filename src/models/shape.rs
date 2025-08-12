@@ -1,75 +1,108 @@
 use super::Vector;
 
-pub enum Shape {
-    Particle(Particle),
-    Rectangle(Rectangle)
+#[derive(Clone)]
+pub struct Shape {
+    pub points: Vec<Vector>,
 }
 
 impl Shape {
-    pub fn get_points(&mut self) -> Vec<Vector> {
-        match self {
-            Shape::Particle(particle) => particle.get_points(),
-            Shape::Rectangle(rectangle) => rectangle.get_points(),
+    pub fn new(points: Vec<Vector>) -> Shape {
+        return Shape {points};
+    }
+
+    pub fn centre(&mut self) {
+        let mut total_x = 0.0;
+        let mut total_y = 0.0;
+
+        for point in self.points.iter() {
+            total_x += point.x;
+            total_y += point.y;
+        }
+
+        let average_x = total_x / (self.points.len() as f64);
+        let average_y = total_y / (self.points.len() as f64);
+
+        for point in self.points.iter_mut() {
+            point.x -= average_x;
+            point.y -= average_y;
         }
     }
-}
 
-#[derive(Copy, Clone)]
-pub struct Particle {
-    
-}
+    pub fn contains(&mut self, position: Vector) -> bool {
+        let mut lines: Vec<(Vector, Vector)> = vec![];
 
-impl Particle {
-    pub fn new() -> Particle {
-        return Particle {};
+        for i in 0..(self.points.len() - 1) {
+            lines.push((self.points[i], self.points[i+1]));
+        }
+
+        let mut outside: Vector = Vector::new(0.0, 0.0);
+
+        for point in self.points.iter_mut() {
+            if point.x > outside.x {
+                outside.x = point.x;
+            }
+            if point.y > outside.y {
+                outside.y = outside.y;
+            }
+        }
+
+        outside.x += 1.0;
+        outside.y += 1.0;
+
+        let direction: Vector = position - outside;
+
+        let mut crosses = 0;
+
+        for line in lines {
+            // if (direction.x + line.0.x - line.1.x) == 0.0 || (direction.y + line.0.y - line.1.y) == 0.0 {
+            //     continue;
+            // }
+
+            let alpha = direction.x * (line.0.y - line.1.y) - direction.y * (line.0.x - line.1.x);
+
+            if alpha == 0.0 {
+                continue;
+            }
+
+            let lambda = ((line.0.y - line.1.y) * (line.0.x - position.x) + (line.1.x - line.0.x) * (line.0.y - position.y)) / alpha;
+            // let mu = (-direction.y * (line.0.x - position.x) + direction.x * (line.0.y - position.y)) / alpha;
+
+            let crossing_point = position + direction * lambda;
+
+            if Self::point_on_line(line, crossing_point) {
+                crosses += 1;
+            }
+        }
+
+        if crosses % 2 == 0 {
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 
-    fn get_points(&mut self) -> Vec<Vector> {
-        return vec![Vector::new(0.0, 0.0)];
-    }
+    fn point_on_line(line: (Vector, Vector), point: Vector) -> bool {
+        if line.0.x <= line.1.x {
+            if !(line.0.x < point.x && line.1.x > point.x) {
+                return false;
+            }
+        } else {
+            if !(line.0.x > point.x && line.1.x < point.x) {
+                return false;
+            }
+        }
 
-    fn _centre(&mut self) {
+        if line.0.y <= line.1.y {
+            if !(line.0.y < point.y && line.1.y > point.y) {
+                return false;
+            }
+        } else {
+            if !(line.0.y > point.y && line.1.y < point.y) {
+                return false;
+            }
+        }
 
-    }
-}
-
-#[derive(Copy, Clone)]
-pub struct Rectangle {
-    point1: Vector,
-    point4: Vector,
-}
-
-impl Rectangle {
-    pub fn new(point1: Vector, point4: Vector) -> Rectangle {
-        let mut rect = Rectangle {point1, point4};
-
-        rect.centre();
-
-        return rect;
-    }
-
-    fn get_points(&mut self) -> Vec<Vector> {
-        return vec![self.get_point1(), self.get_point2(), self.get_point3(), self.get_point4()];
-    }
-
-    fn centre(&mut self) {
-        let average_x = (self.get_point4().x - self.get_point1().x) / 2.0;
-        let average_y = (self.get_point4().y - self.get_point1().y) / 2.0;
-
-        self.point1 = Vector::new(self.get_point1().x - average_x, self.get_point1().y - average_y);
-        self.point4 = Vector::new(self.get_point4().x - average_x, self.get_point4().y - average_y);
-    }
-
-    pub fn get_point1(&mut self) -> Vector {
-        return self.point1;
-    }
-    pub fn get_point2(&mut self) -> Vector {
-        return Vector::new(self.point1.x, self.point4.y);
-    }
-    pub fn get_point3(&mut self) -> Vector {
-        return Vector::new(self.point4.x, self.point1.y);
-    }
-    pub fn get_point4(&mut self) -> Vector {
-        return self.point4;
+        return true;
     }
 }
