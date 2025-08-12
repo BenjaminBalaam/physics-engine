@@ -12,27 +12,28 @@ use super::Object;
 pub struct World {
     pub gl: GlGraphics,
     pub objects: Vec<Object>,
+    pub size: Vector,
 }
 
 impl World {
-    pub fn new(gl: GlGraphics, objects: Vec<Object>) -> World {
-        World {gl, objects}
+    pub fn new(gl: GlGraphics, objects: Vec<Object>, size: Vector) -> World {
+        let mut world = World {gl, objects, size};
+
+        for object in world.objects.iter_mut() {
+            object.forces.push(Vector::new(0.0, -9.81));
+        }
+
+        world
     }
 
     pub fn render(&mut self, args: &RenderArgs) {
         use graphics::*;
 
         self.gl.draw(args.viewport(), |c, gl| {
-            for object in self.objects.iter() {
-                clear([0.0, 0.0, 0.0, 1.0], gl);
+            clear([0.0, 0.0, 0.0, 1.0], gl);
 
-                let square = rectangle::square(-25.0, -25.0, 50.0);
-
-                let transform = c.transform
-                    .trans(object.position.x, object.position.y)
-                    .rot_rad(object.rotation);
-                
-                rectangle(object.colour, square, transform, gl);
+            for object in self.objects.iter_mut() {
+                object.render(args, c, gl, self.size);
             }
         });
     }
@@ -40,8 +41,8 @@ impl World {
     pub fn update(&mut self, args: &UpdateArgs) {
         for object in self.objects.iter_mut() {
             object.update(args);
-
-            object.velocity += Vector::new(0.0, 0.01);
         }
+
+        self.objects.sort_by(|a, b| a.z_index.total_cmp(&b.z_index));
     }
 }
