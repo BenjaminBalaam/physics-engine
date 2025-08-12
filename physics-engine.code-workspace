@@ -5,6 +5,11 @@
 		}
 	],
 	"settings": {
-		"debug.allowBreakpointsEverywhere": true
+		"debug.allowBreakpointsEverywhere": true,
+		"rust-analyzer.linkedProjects": [
+			".\\Cargo.toml",
+			".\\Cargo.toml",
+			".\\Cargo.toml"
+		]
 	}
 }
