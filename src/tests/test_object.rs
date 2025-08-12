@@ -10,11 +10,12 @@ use crate::models::shape::*;
 fn test_add_force() {
     let mut obj = Object::new(
         [0.0, 0.0, 0.0, 1.0],
-        Shape::Particle(Particle::new()),
+        Shape::new(vec![]),
         1.0,
         Vector::new(0.0, 0.0),
         0.0,
         Vector::new(0.0, 0.0),
+        0.0,
         HashMap::new(),
         0.0,
     );
@@ -30,11 +31,12 @@ fn test_add_force() {
 fn test_remove_force() {
     let mut obj = Object::new(
         [0.0, 0.0, 0.0, 1.0],
-        Shape::Particle(Particle::new()),
+        Shape::new(vec![]),
         1.0,
         Vector::new(0.0, 0.0),
         0.0,
         Vector::new(0.0, 0.0),
+        0.0,
         HashMap::new(),
         0.0,
     );
@@ -50,11 +52,12 @@ fn test_remove_force() {
 fn test_update() {
     let mut obj = Object::new(
         [0.0, 0.0, 0.0, 1.0],
-        Shape::Particle(Particle::new()),
+        Shape::new(vec![]),
         1.0,
         Vector::new(0.0, 0.0),
         0.0,
         Vector::new(0.0, -9.81),
+        0.0,
         HashMap::new(),
         0.0,
     );
@@ -71,10 +74,11 @@ fn test_update() {
 fn test_update_passive() {
     let mut obj = Object::new_passive(
         [0.0, 0.0, 0.0, 1.0],
-        Shape::Particle(Particle::new()),
+        Shape::new(vec![]),
         Vector::new(0.0, 0.0),
         0.0,
         Vector::new(0.0, -9.81),
+        0.0,
         HashMap::new(),
         0.0,
     );

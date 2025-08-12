@@ -7,17 +7,7 @@ pub fn vector_pow(v: Vector, pow: f64) -> Vector {
     Vector::new(v.x.powf(pow), v.y.powf(pow))
 }
 
-pub fn pp_collision(particle1: &Object, particle2: &Object) -> (Vector, Vector) {
-    if particle1.passive || particle2.passive {
-        return (-particle1.velocity, -particle2.velocity);
-    }
-
-    let m1 = particle1.mass;
-    let u1 = particle1.velocity;
-
-    let m2 = particle2.mass;
-    let u2 = particle2.velocity;
-
+fn solve_for_velocities(m1: f64, m2: f64, u1: Vector, u2: Vector) -> (Vector, Vector) {
     let total_momentum = u1 * m1 + u2 * m2;
     let total_energy = vector_pow(u1, 2.0) * m1 + vector_pow(u2, 2.0) * m2;
 
@@ -37,4 +27,25 @@ pub fn pp_collision(particle1: &Object, particle2: &Object) -> (Vector, Vector) 
     let v1 = (total_momentum - v2 * m2) / m1;
 
     return (v1, v2);
+}
+
+pub fn pp_collision(particle1: &Object, particle2: &Object) -> (Vector, Vector) {
+    if particle1.passive || particle2.passive {
+        return (-particle1.velocity, -particle2.velocity);
+    }
+
+    return solve_for_velocities(particle1.mass, particle2.mass, particle1.velocity, particle2.velocity);
+}
+
+pub fn ps_collision(particle: &Object, shape: &Object) -> ((Vector, f64), (Vector, f64)) {
+    let p1 = Vector::new(particle.position.x + 1.0, particle.position.y);
+    let p2 = Vector::new(particle.position.x - 1.0, particle.position.y);
+
+    let u1 = particle.velocity;
+    let u2 = particle.velocity;
+
+    let u3 = shape.velocity + (p1 - shape.position) * shape.angular_velocity;
+    let u4 = shape.velocity + (p1 - shape.position) * shape.angular_velocity;
+
+    return ((Vector::new(0.0, 0.0), 0.0), (Vector::new(0.0, 0.0), 0.0));
 }

@@ -8,9 +8,9 @@ use piston::input::{RenderArgs, UpdateArgs};
 
 use super::Vector;
 use super::Object;
-use super::shape::*;
 
 use crate::collision;
+use crate::collision::ps_collision;
 
 pub struct World {
     pub gl: Option<GlGraphics>,
@@ -58,21 +58,37 @@ impl World {
             for j in i+1..self.objects.len() {
                 let object1 = self.objects.get(i).unwrap();
                 let object2 = self.objects.get(j).unwrap();
-                
-                if let Shape::Particle(_p1) = object1.shape {
-                    if let Shape::Particle(_p2) = object2.shape {
-                        if (object1.position - object2.position).magnitude() < 2.0 {
-                            let (v1, v2) = collision::pp_collision(object1, object2);
 
-                            {
-                                let obj_1 = self.objects.get_mut(i).unwrap();
-                                obj_1.velocity = v1;
-                            }
-                            {
-                                let obj_2 = self.objects.get_mut(j).unwrap();
-                                obj_2.velocity = v2;
-                            }
+                if object1.shape.points.len() == 0 && object2.shape.points.len() == 0 {
+                    if (object1.position - object2.position).magnitude() < 2.0 {
+                        let (v1, v2) = collision::pp_collision(object1, object2);
+
+                        {
+                            let obj_1 = self.objects.get_mut(i).unwrap();
+                            obj_1.velocity = v1;
                         }
+                        {
+                            let obj_2 = self.objects.get_mut(j).unwrap();
+                            obj_2.velocity = v2;
+                        }
+                    }
+                } else if object1.shape.points.len() == 0 || object2.shape.points.len() == 0 {
+                    let ((v1, av1), (v2, av2)): ((Vector, f64), (Vector, f64));
+
+                    if object1.shape.points.len() == 0 {
+                        if self.objects.get_mut(j).unwrap().shape.contains(object1.position) {
+                            ((v1, av1), (v2, av2)) = ps_collision(object1, object2);
+                        }
+                    } else {
+                        if self.objects.get_mut(i).unwrap().shape.contains(object2.position) {
+                            ((v2, av2), (v1, av1)) = ps_collision(object2, object1);
+                        }
+                    }
+
+                    {
+                        let obj_2 = self.objects.get_mut(j).unwrap();
+                        obj_2.velocity = v2;
+                        obj_2.angular_velocity = av2;
                     }
                 }
             }
